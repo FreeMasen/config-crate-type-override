@@ -10,15 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  create_log_dir:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: mkdir
-      run: mkdir -p ${{ github.workspace }}/logs
-    
   build:
-    needs: create_log_dir
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -32,6 +24,7 @@ jobs:
           - cdylib
           - staticlib
     steps:
+    - uses: actions/checkout@v3
     - name: build with string
       run: >-
         echo "----------build ${{matrix.prefix}}crate-type = ${{matrix.value}}----------" > ${{ github.workspace }}/${{matrix.prefix}}${{matrix.value}}.txt &&

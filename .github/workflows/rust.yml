@@ -18,19 +18,25 @@ jobs:
     - uses: actions/checkout@v3
     - name: build 
       run: >-
-        echo "build (no override)" > ./output-listing.txt &&
+        echo "build (no override)" > ${{ github.workspace }}/output-listing.txt &&
         rm -rf ./target/ &&
         cargo build --lib --release --config 'lib.crate-type = ["cdylib"]' &&
-        ls ./target/release/ >> ./output-listing.txt
+        ls ./target/release/ >> ${{ github.workspace }}/output-listing.txt
     - name: build staticlib
       run: >-
-        echo "static lib" >> ./output-listing.txt
+        echo "static lib" >> ${{ github.workspace }}/output-listing.txt
         rm -rf ./target/ &&
         cargo build --lib --release --config 'lib.crate-type = ["staticlib"]' &&
-        ls ./target/release/ >> ./output-listing.txt
+        ls ./target/release/ >> ${{ github.workspace }}/output-listing.txt
     - name: build cdylib
       run: >-
-        echo "cdylib lib" >> ./output-listing.txt
+        echo "cdylib lib" >> ${{ github.workspace }}/output-listing.txt
         rm -rf ./target/ &&
         cargo build --lib --release --config 'lib.crate-type = ["cdylib"]' &&
-        ls ./target/release/ >> ./output-listing.txt
+        ls ./target/release/ >> ${{ github.workspace }}/output-listing.txt
+    - name: print output
+      run: cat ${{ github.workspace }}/output-listing.txt
+    - uses: actions/upload-artifact@v3
+      with:
+        name: output-listing.txt
+        path: ${{ github.workspace }}/output-listing.txt

@@ -10,49 +10,45 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  create_log_dir:
+    - uses: actions/checkout@v3
+    - name: mkdir
+      run: mkdir -p ${{ github.workspace }}/logs
+    
   build:
+    needs: create_log_dir
 
+    matrix:
+      prefix: 
+        - 
+        - "lib."
+      values:
+        - lib
+        - rlib
+        - dylib
+        - cdylib
+        - staticlib
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
     - name: build 
       run: >-
-        echo "----------build (no override)----------" > ${{ github.workspace }}/output-listing.txt &&
+        echo "----------build ${{matrix.prefix}}crate-type = ${{matrix.value}}----------" > ${{ github.workspace }}/logs/${{matrix.prefix}}${{matrix.value}}.txt &&
         rm -rf ./target/ &&
-        cargo build --lib --release --config 'lib.crate-type = ["cdylib"]' &&
-        ls ./target/release/ >> ${{ github.workspace }}/output-listing.txt &&
-        echo "------------------------------" >> ${{ github.workspace }}/output-listing.txt
-    - name: build [staticlib]
+        cargo build --lib --release --config '${{matrix.prefix}}crate-type = "${{matrix.value}}"' &&
+        ls ./target/release/ >> ${{ github.workspace }}/logs/${{matrix.prefix}}${{matrix.value}}.txt &&
+        echo "------------------------------" >> ${{ github.workspace }}/logs/${{matrix.prefix}}${{matrix.value}}.txt
       run: >-
-        echo "----------[static] lib----------" >> ${{ github.workspace }}/output-listing.txt &&
+        echo "----------build ${{matrix.prefix}}crate-type = [${matrix.value}]----------" > ${{ github.workspace }}/logs/${{matrix.prefix}}${{matrix.value}}-array.txt &&
         rm -rf ./target/ &&
-        cargo build --lib --release --config 'lib.crate-type = ["staticlib"]' &&
-        ls ./target/release/ >> ${{ github.workspace }}/output-listing.txt &&
-        echo "------------------------------" >> ${{ github.workspace }}/output-listing.txt
-    - name: build staticlib
-      run: >-
-        echo "----------[static] lib----------" >> ${{ github.workspace }}/output-listing.txt &&
-        rm -rf ./target/ &&
-        cargo build --lib --release --config 'lib.crate-type = "staticlib"' &&
-        ls ./target/release/ >> ${{ github.workspace }}/output-listing.txt &&
-        echo "------------------------------" >> ${{ github.workspace }}/output-listing.txt
-    - name: build [cdylib]
-      run: >-
-        echo "----------[cdylib] lib----------" >> ${{ github.workspace }}/output-listing.txt &&
-        rm -rf ./target/ &&
-        cargo build --lib --release --config 'lib.crate-type = ["cdylib"]' &&
-        ls ./target/release/ >> ${{ github.workspace }}/output-listing.txt &&
-        echo "------------------------------" >> ${{ github.workspace }}/output-listing.txt
-    - name: build cdylib
-      run: >-
-        echo "----------cdylib lib----------" >> ${{ github.workspace }}/output-listing.txt &&
-        rm -rf ./target/ &&
-        cargo build --lib --release --config 'lib.crate-type = "cdylib"' &&
-        ls ./target/release/ >> ${{ github.workspace }}/output-listing.txt &&
-        echo "------------------------------" >> ${{ github.workspace }}/output-listing.txt
+        cargo build --lib --release --config '${{matrix.prefix}}crate-type = [${{matrix.value}}]' &&
+        ls ./target/release/ >> ${{ github.workspace }}/logs/${{matrix.prefix}}${{matrix.value}}-array.txt &&
+        echo "------------------------------" >> ${{ github.workspace }}/logs/${{matrix.prefix}}${{matrix.value}}-array.txt
+  output:
+    needs: build
+    steps:
     - name: print output
-      run: cat ${{ github.workspace }}/output-listing.txt
+      run: cat ${{ github.workspace }}/logs/*.txt | tee ${{ github.workspace }}/output-listing.txt
     - uses: actions/upload-artifact@v3
       with:
         name: output-listing.txt

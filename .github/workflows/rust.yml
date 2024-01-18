@@ -24,13 +24,13 @@ jobs:
         ls ./target/release/ >> ${{ github.workspace }}/output-listing.txt
     - name: build staticlib
       run: >-
-        echo "static lib" >> ${{ github.workspace }}/output-listing.txt
+        echo "static lib" >> ${{ github.workspace }}/output-listing.txt &&
         rm -rf ./target/ &&
         cargo build --lib --release --config 'lib.crate-type = ["staticlib"]' &&
         ls ./target/release/ >> ${{ github.workspace }}/output-listing.txt
     - name: build cdylib
       run: >-
-        echo "cdylib lib" >> ${{ github.workspace }}/output-listing.txt
+        echo "cdylib lib" >> ${{ github.workspace }}/output-listing.txt &&
         rm -rf ./target/ &&
         cargo build --lib --release --config 'lib.crate-type = ["cdylib"]' &&
         ls ./target/release/ >> ${{ github.workspace }}/output-listing.txt

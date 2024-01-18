@@ -20,16 +20,17 @@ jobs:
   build:
     needs: create_log_dir
     runs-on: ubuntu-latest
-    matrix:
-      prefix: 
-        - 
-        - "lib."
-      values:
-        - lib
-        - rlib
-        - dylib
-        - cdylib
-        - staticlib
+    strategy:
+      matrix:
+        prefix: 
+          - 
+          - "lib."
+        values:
+          - lib
+          - rlib
+          - dylib
+          - cdylib
+          - staticlib
     steps:
     - name: build with string
       run: >-

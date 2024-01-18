@@ -11,13 +11,15 @@ env:
 
 jobs:
   create_log_dir:
+    runs-on: ubuntu-latest
+    steps:
     - uses: actions/checkout@v3
     - name: mkdir
       run: mkdir -p ${{ github.workspace }}/logs
     
   build:
     needs: create_log_dir
-
+    runs-on: ubuntu-latest
     matrix:
       prefix: 
         - 
@@ -28,16 +30,15 @@ jobs:
         - dylib
         - cdylib
         - staticlib
-    runs-on: ubuntu-latest
-
     steps:
-    - name: build 
+    - name: build with string
       run: >-
         echo "----------build ${{matrix.prefix}}crate-type = ${{matrix.value}}----------" > ${{ github.workspace }}/logs/${{matrix.prefix}}${{matrix.value}}.txt &&
         rm -rf ./target/ &&
         cargo build --lib --release --config '${{matrix.prefix}}crate-type = "${{matrix.value}}"' &&
         ls ./target/release/ >> ${{ github.workspace }}/logs/${{matrix.prefix}}${{matrix.value}}.txt &&
         echo "------------------------------" >> ${{ github.workspace }}/logs/${{matrix.prefix}}${{matrix.value}}.txt
+    - name: build with array
       run: >-
         echo "----------build ${{matrix.prefix}}crate-type = [${matrix.value}]----------" > ${{ github.workspace }}/logs/${{matrix.prefix}}${{matrix.value}}-array.txt &&
         rm -rf ./target/ &&
@@ -45,6 +46,7 @@ jobs:
         ls ./target/release/ >> ${{ github.workspace }}/logs/${{matrix.prefix}}${{matrix.value}}-array.txt &&
         echo "------------------------------" >> ${{ github.workspace }}/logs/${{matrix.prefix}}${{matrix.value}}-array.txt
   output:
+    runs-on: ubuntu-latest
     needs: build
     steps:
     - name: print output

@@ -1,0 +1,36 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+    
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: build 
+      run: >-
+        echo "build (no override)" > ./output-listing.txt &&
+        rm -rf ./target/ &&
+        cargo build --lib --release --config 'lib.crate-type = ["cdylib"]' &&
+        ls ./target/release/ >> ./output-listing.txt
+    - name: build staticlib
+      run: >-
+        echo "static lib" >> ./output-listing.txt
+        rm -rf ./target/ &&
+        cargo build --lib --release --config 'lib.crate-type = ["staticlib"]' &&
+        ls ./target/release/ >> ./output-listing.txt
+    - name: build cdylib
+      run: >-
+        echo "cdylib lib" >> ./output-listing.txt
+        rm -rf ./target/ &&
+        cargo build --lib --release --config 'lib.crate-type = ["cdylib"]' &&
+        ls ./target/release/ >> ./output-listing.txt

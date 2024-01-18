@@ -36,7 +36,7 @@ jobs:
       run: >-
         echo "----------build ${{matrix.prefix}}crate-type = [${{matrix.value}}]----------" >> ${{ github.workspace }}/${{matrix.prefix}}${{matrix.value}}.txt &&
         rm -rf ./target/ &&
-        cargo build --lib --release --config '${{matrix.prefix}}crate-type = [${{matrix.value}}]' &&
+        cargo build --lib --release --config '${{matrix.prefix}}crate-type = ["${{matrix.value}}"]' &&
         ls ./target/release/ >> ${{ github.workspace }}/${{matrix.prefix}}${{matrix.value}}.txt &&
         echo "------------------------------" >> ${{ github.workspace }}/${{matrix.prefix}}${{matrix.value}}.txt
     - uses: actions/upload-artifact@v3

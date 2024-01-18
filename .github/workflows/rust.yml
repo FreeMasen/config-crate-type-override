@@ -25,7 +25,7 @@ jobs:
         prefix: 
           - 
           - "lib."
-        values:
+        value:
           - lib
           - rlib
           - dylib

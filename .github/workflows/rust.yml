@@ -34,25 +34,21 @@ jobs:
     steps:
     - name: build with string
       run: >-
-        echo "----------build ${{matrix.prefix}}crate-type = ${{matrix.value}}----------" > ${{ github.workspace }}/logs/${{matrix.prefix}}${{matrix.value}}.txt &&
+        echo "----------build ${{matrix.prefix}}crate-type = ${{matrix.value}}----------" > ${{ github.workspace }}/${{matrix.prefix}}${{matrix.value}}.txt &&
         rm -rf ./target/ &&
         cargo build --lib --release --config '${{matrix.prefix}}crate-type = "${{matrix.value}}"' &&
-        ls ./target/release/ >> ${{ github.workspace }}/logs/${{matrix.prefix}}${{matrix.value}}.txt &&
-        echo "------------------------------" >> ${{ github.workspace }}/logs/${{matrix.prefix}}${{matrix.value}}.txt
+        ls ./target/release/ >> ${{ github.workspace }}/${{matrix.prefix}}${{matrix.value}}.txt &&
+        echo "------------------------------" >> ${{ github.workspace }}/${{matrix.prefix}}${{matrix.value}}.txt
     - name: build with array
       run: >-
-        echo "----------build ${{matrix.prefix}}crate-type = [${matrix.value}]----------" > ${{ github.workspace }}/logs/${{matrix.prefix}}${{matrix.value}}-array.txt &&
+        echo "----------build ${{matrix.prefix}}crate-type = [${matrix.value}]----------" >> ${{ github.workspace }}/${{matrix.prefix}}${{matrix.value}}.txt &&
         rm -rf ./target/ &&
         cargo build --lib --release --config '${{matrix.prefix}}crate-type = [${{matrix.value}}]' &&
-        ls ./target/release/ >> ${{ github.workspace }}/logs/${{matrix.prefix}}${{matrix.value}}-array.txt &&
-        echo "------------------------------" >> ${{ github.workspace }}/logs/${{matrix.prefix}}${{matrix.value}}-array.txt
-  output:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-    - name: print output
-      run: cat ${{ github.workspace }}/logs/*.txt | tee ${{ github.workspace }}/output-listing.txt
+        ls ./target/release/ >> ${{ github.workspace }}/${{matrix.prefix}}${{matrix.value}}.txt &&
+        echo "------------------------------" >> ${{ github.workspace }}/${{matrix.prefix}}${{matrix.value}}.txt
     - uses: actions/upload-artifact@v3
       with:
-        name: output-listing.txt
-        path: ${{ github.workspace }}/output-listing.txt
+        name: ${{matrix.prefix}}${{matrix.value}}.txt
+        path: ${{ github.workspace }}/${{matrix.prefix}}${{matrix.value}}.txt
+    - name: print output
+      run: cat ${{ github.workspace }}/${{matrix.prefix}}${{matrix.value}}.txt
